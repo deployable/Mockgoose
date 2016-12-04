@@ -1,53 +1,54 @@
-[![Build Status](https://travis-ci.org/mccormicka/Mockgoose.png?branch=master)](https://travis-ci.org/mccormicka/Mockgoose)
+[![Build Status](https://travis-ci.org/deployable/mockgodb.png?branch=master)](https://travis-ci.org/deployable/mockgodb)
 
-Please Share on Twitter if you like #mockgoose
-<a href="https://twitter.com/intent/tweet?hashtags=mockgoose&amp;&amp;text=Check%20out%20this%20%23Mongoose%20%23MongoDB%20Mocking%20Framework&amp;tw_p=tweetbutton&amp;url=http%3A%2F%2Fbit.ly%2F19gcHwm&amp;via=omnipitence" style="float:right">
-<img src="https://raw.github.com/mccormicka/Mockgoose/master/twittershare.png">
-</a>
+## MockgoDB
 
-## What is Mockgoose?
+MockgoDB provides test database by spinning up mongod on the back when `MongoClient.connect` call is made. By default it is using in memory store which does not have persistence.
 
-Mockgoose provides test database by spinning up mongod on the back when mongoose.connect call is made. By default it is using in memory store which does not have persistence.
+The code is based of the excellent [Mockgoose](https://github.com/Mockgoose/Mockgoose) which does the same for a Mongoose connection.
 
 ## Install
+
 To install the latest official version, use NPM:
 
-    npm install mockgoose --save-dev
+    npm install mockgodb --save-dev
 
 
 ## Usage
-You simply require Mongoose and Mockgoose and wrap Mongoose with Mockgoose.
 
-    var mongoose = require('mongoose');
-    var mockgoose = require('mockgoose');
+You simply require `mockgodb` before your connection statement.
 
-    mockgoose(mongoose).then(function() {
-		// mongoose connection		
-	});
+    const Mockgodb = require('mockgodb');
+    const MongoClient = require('mongodb').MongoClient;
 
-Once Mongoose has been wrapped by Mockgoose connect() will be intercepted by Mockgoose so that no MongoDB instance is created.
+    Mockgodb.setup(MongoClient)
+      .then(() => MongoClient.connect("mongodb://dbhost.you.com:27017/all_Data"))
+      .then((db) => db.findOne({ name: "test" }))
+      .then((doc) => console.log(doc))
+
+Once mockgodb has setup any `connect()` will be intercepted so no real databases are connected to.
 
 ## Mocha
 
 ```javascript
-var Mongoose = require('mongoose').Mongoose;
-var mongoose = new Mongoose();
-
-var mockgoose = require('mockgoose');
+const Mockgodb = require('mockgodb')
+let app = null
 
 before(function(done) {
-	mockgoose(mongoose).then(function() {
-		mongoose.connect('mongodb://example.com/TestingDB', function(err) {
-			done(err);
-		});
-	});
+  Mockgodb.setup(MongoClient)
+    .then(() => {
+      app = require('../app')
+      done()
+    }
+  });
 });
 
 describe('...', function() {
-	it("...", function(done) {
-		// ...
-		done();
-	});
+  it('Retrieve a document', function(done) {
+    return app.get(id).then(doc => {
+      expect(doc).to.be.ok
+      expect(doc).to.have.property('name').and.to.equal("Jim")
+    })
+  });
 });
 ```
 
@@ -55,47 +56,44 @@ describe('...', function() {
 
 ### reset(callback)
 Reset method will remove **ALL** of the collections from a temporary store,
-note that this method is part of **mockgoose** object, and not defined under
-**mongoose**
+note that this method is part of **Mockgodb** object.
 
 ```javascript
-mockgoose.reset(function() {
-	done()
-});
+Mockgodb.reset(() => done())
 ```
 
 ### isMocked
-Returns **TRUE** from **mongoose** object if Mockgoose is applied
+Returns **TRUE** from **MongoClient `db`** object if Mockgodb is applied
 
 ```javascript
-if ( mongoose.isMocked === true ) {
-  // mongoose object is mocked
+if ( db.isMocked === true ) {
+  // Mongo db connection is mocked
 }
 ```
 
 ## unmock(callback)
-Method that can be applied on **mongoose** to remove modifications added
-by **mockgoose**, it will perform disconnect on temporary store that was
+Method that can be applied on **MongoClient `db`** to remove modifications added
+by **Mockgodb**, it will perform disconnect on temporary store that was
 created, and **will not reconnect**
 
 ## unmockAndReconnect(callback)
 Same as **unmock**, however it will reconnect to original URI that was
 passed during **connect**
 
-## Development
-
-This section contains instructions for developers working on the Mockgoose codebase.
-It is not relevant if you just want to use Mockgoose as a library in your project.
-
 ### Pre-requisites
 
-* Node.js >= 0.10.0
+* Node.js >= 4.0.0
+
+### Development
+
+Mockgodb is written in ES6 using Bluebird promises. It uses Babel to compile to js. 
+Mocha/Chai to test and eslint to keep itself in line. 
 
 ### Setup
 
 ```
-git clone git@github.com:mccormicka/Mockgoose.git
-cd Mockgoose
+git clone https://github.com/deployable/mockgodb.git
+cd mockgodb
 npm install
 npm test
 ```
