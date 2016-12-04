@@ -1,17 +1,21 @@
 {
-  "name": "mockgoose",
-  "description": "Mockgoose is an in memory database mock to allow for testing of applications that rely on Mongoose.",
-  "version": "6.0.8",
+  "name": "mockgodb",
+  "description": "Mockgodb is an in memory database mock to allow for testing of applications that rely on Mongodb. Based on Mockgoose",
+  "version": "1.0.0",
   "author": {
-    "name": "Anthony McCormick",
-    "email": "anthony.mccormick AT gmail.com"
+    "name": "Matt Hoyle",
+    "email": "matt AT deployable.co"
   },
+  "contributors":[
+    {
+      "name": "Anthony McCormick",
+      "email": "anthony.mccormick AT gmail.com"
+    } 
+  ],
   "keywords": [
     "mongodb",
-    "mongoose",
     "datastore",
     "nosql",
-    "sql",
     "db",
     "database",
     "mock",
@@ -19,35 +23,42 @@
     "in memory"
   ],
   "scripts": {
-    "hint": "jshint --config .jshintrc Mockgoose.js test",
-    "test": "DEBUG=mongodb*,Mockgoose mocha --timeout 50000 test",
-    "test-debug": "DEBUG=mongodb*,Mockgoose mocha debug --timeout 50000 test"
+    "eslint": "eslint src test",
+    "test": "mocha --timeout 5000 test",
+    "test:debug": "DEBUG='mongodb*,dply:mockgodb*' mocha debug test",
+    "babel": "babel src/mockgodb.es6 --out-file mockgodb.js -s",
+    "babel:watch": "babel src/mockgodb.es6 --watch --out-file mockgodb.js -s"
   },
-  "main": "Mockgoose",
+  "main": "mockgodb",
   "files": [
-    "Mockgoose.js",
-    "lib/"
+    "mockgodb.js",
+    "src/"
   ],
   "engines": {
     "node": ">=0.10.0"
   },
   "dependencies": {
-    "debug": "2.2.0",
-    "mongodb-prebuilt": "^5.0.6",
-    "portfinder": "^1.0.3",
+    "debug": "^2",
+    "mongodb-prebuilt": "^5.0.8",
+    "portfinder": "^1.0.10",
     "rimraf": "^2.5.1",
-	"q": "^1.4.1"
+    "bluebird": "^3"
   },
   "devDependencies": {
-    "chai": "~2.2.0",
-    "mocha": "~2.2.4",
-    "mongoose": "*"
+    "babel": "^6.5.2",
+    "babel-cli": "^6.18.0",
+    "babel-preset-latest": "^6.16.0",
+    "chai": "~3.5.0",
+    "eslint": "^3.11.1",
+    "mocha": "~3.2.0",
+    "mongodb": "^2.2.12",
+    "source-map-support": "^0.4.6"
   },
   "bugs": {
-    "url": "https://github.com/mccormicka/Mockgoose/issues"
+    "url": "https://github.com/dpeloyable/mockgodb/issues"
   },
-  "repository": "Mockgoose/Mockgoose",
-  "homepage": "https://github.com/Mockgoose/Mockgoose",
+  "repository": "https://github.com/deployable/mockgod.git",
+  "homepage": "https://github.com/deployable/mockgodb",
   "readmeFilename": "README.md",
   "license": "MIT"
 }
